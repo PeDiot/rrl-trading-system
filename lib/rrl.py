@@ -4,7 +4,7 @@ Implement an automated trading system based on recurrent reinforcement learning 
 
 import numpy as np 
 
-from .forward import (
+from forward import (
     linear_transform, 
     activate, 
     get_positions,
@@ -33,10 +33,11 @@ class RRL:
         delta: float=0
     ):
         self.n_assets, self.n_features = n_assets, n_features
-        self.delta = delta 
         self.rho, self.l2 = rho, l2
         self.n_epochs = n_epochs
         self.tol = tol
+        self.delta = delta 
+
 
         np.random.seed(42)
 
@@ -44,7 +45,7 @@ class RRL:
         self.F0 = np.zeros(shape=(self.n_assets, ))
 
     def __repr__(self) -> str:
-        return f"RRL({self.n_assets=})"
+        return f"RRL(n_assets={self.n_assets}, n_features={self.n_features}, rho={self.rho}, l2={self.l2}, n_epochs={self.n_epochs}, tol={self.tol}, delta={self.delta})"
         
     def forward(self, X: np.ndarray, F_prev: np.ndarray): 
         """Description. Forward propagation.
@@ -64,3 +65,4 @@ class RRL:
         y = linear_transform(X, self.theta)
         z = activate(y)
         return get_positions(z)
+
