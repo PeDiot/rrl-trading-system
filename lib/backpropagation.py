@@ -50,7 +50,7 @@ def calc_positions_derivative(
         - X: (m, n+2) feature matrix
         - theta: (m, n+2) matrix of network parameters
         - y: (m, 1) matrix of linear transformations
-        - dFprev: derivative of portfolio positions at time t-1
+        - dFprev: (m, n+2) derivative matrix of portfolio positions at time t-1
         
     Returns: matrix with derivatives of positions wrt theta matrix."""
 
@@ -67,7 +67,10 @@ def calc_positions_derivative(
 
     theta_Fprev = theta[:, -1].T
 
-    return dFdf * dFdy * (np.sum(X, axis=1) + np.diag(theta_Fprev) * dFprev)
+    a = np.dot(dFdf, dFdy)
+    b = X + np.dot(np.diag(theta_Fprev), dFprev)
+
+    return np.dot(a, b)
 
 def calc_sharpe_derivative(
     portfolio_returns: np.ndarray, 
@@ -88,7 +91,7 @@ def calc_sharpe_derivative(
         - delta: transaction costs
         - F: (m, 1) matrix ofportfolio positions at time t
         - F_prev: (m, 1) matrix of portfolio positions at time t-1
-        - dFprev: (m, m) matrix derivative of portfolio positions at time t-1
+        - dFprev: (m, n+2) matrix derivative of portfolio positions at time t-1
         - X: (m, n+2) feature matrix
         - theta: (m, n+2) matrix of network parameters
         - y: (m, 1) matrix of linear transformations

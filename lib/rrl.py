@@ -3,6 +3,7 @@
 Implement an automated trading system based on recurrent reinforcement learning and technical indicators."""
 
 import numpy as np 
+from tqdm import tqdm
 
 from .forward import (
     linear_transform, 
@@ -43,6 +44,7 @@ class RRL:
             - theta: initialized network parameter matrix
             - F: initilized positions
             - dF: initialized derivative matrix of positions wrt theta
+            - dS: initialized derivative matrix of Sharpe ratio wrt theta
             - portfolio_returns: array to store portfolio returns"""
 
         self.n_assets, self.n_features = n_assets, n_features
@@ -53,7 +55,9 @@ class RRL:
 
         self.theta = np.random.normal(size=(self.n_assets, self.n_features+2))
         self.F = np.zeros(shape=(self.n_assets, 1))
-        self.dF = np.zeros(shape=(1, self.n_assets, self.n_assets))
+
+        self.dS = np.zeros(shape=(self.n_assets, self.n_features+2))
+        self.dF = np.zeros(shape=(1, self.n_assets, self.n_features+2))
 
         self.portfolio_returns = np.ones(shape=(1, 1))
 
@@ -98,7 +102,7 @@ class RRL:
         Attributes: 
             - returns: (m, 1) array of returns at time t."""
 
-        self.dS, dF = calc_sharpe_derivative(
+        dS, dF = calc_sharpe_derivative(
             self.portfolio_returns, 
             returns, 
             self.delta, 
@@ -109,10 +113,32 @@ class RRL:
             self.theta, 
             self._y
         )
+
+        self.dS = self.dS + dS
         self.dF = np.concatenate((
-            self.dF, dF.reshape(1, self.n_assets, self.n_assets)
+            self.dF, dF.reshape(1, self.n_assets, self.n_features+2)
         ))
 
-    def update(self): 
-        """Description. Update network weights using gradient ascent."""
+    def update_weights(self): 
+        """Description. Update network weights using gradient ascent rule."""
+        self.theta = (1 - self.rho * self.l2) * self.theta + self.rho * self.dS
+
+def train(
+    model: RRL, 
+    X: np.ndarray, 
+    returns: np.ndarray, 
+    n_epochs: int, 
+    tol: float
+): 
+    """Description. 
+    Train the recurrent reinforcement learning model on data with m assets and n indicators. 
+    
+    Attributes: 
+        - model: RRL type model
+        - X: (m, n) feature matrix with indicators
+        - returns: (m, 1) array of returns
+        - n_epochs: number of epochs to train the RRL
+        - tol: iteration stopping thresold
         
+    Returns: updated RRL model."""
+    ...
