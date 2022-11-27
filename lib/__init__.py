@@ -8,7 +8,8 @@ from .forward import (
 
 from .backpropagation import (
     calc_portfolio_returns_derivatives, 
-    cal_positions_derivative, 
+    calc_positions_derivative, 
+    calc_sharpe_derivative,
 )
 
 from .metrics import (

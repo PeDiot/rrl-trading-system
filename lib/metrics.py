@@ -9,7 +9,7 @@ def calc_portfolio_returns(
     Fprev: np.ndarray, 
     rt: np.ndarray, 
     delta: float
-) -> float: 
+) -> np.ndarray: 
     """Description. Calculate portfolio returns at time t.
     
     Attributes: 
@@ -27,8 +27,7 @@ def calc_portfolio_returns(
 
     a = 1 + np.dot(Fprev.T, rt)
     b = 1 - delta * np.sum(np.abs(F - Fprev))
-    rt = a * b
-    return rt.flatten()[0] - 1
+    return a * b - 1
 
 def calc_cumulative_profits(returns: np.ndarray, initial: float) -> float: 
     """Description. Calculate cumulative profits since initial investment.
@@ -39,8 +38,12 @@ def calc_cumulative_profits(returns: np.ndarray, initial: float) -> float:
 
     Returns: cumulative returns"""
 
-    return initial * (np.cumprod(1 + returns) - 1)
+    return initial * np.cumprod(returns)
 
 def calc_sharpe_ratio(returns: np.ndarray) -> float: 
-    """Return Sharpe ratio from an array of returns."""
+    """Description. Return Sharpe ratio at time t.
+    
+    Attributes: 
+        - returns: (t, 1) array of sharpe ratios."""
+
     return np.mean(returns) / np.std(returns)

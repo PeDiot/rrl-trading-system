@@ -5,6 +5,8 @@ Methods to calculate derivatives for backpropagation."""
 import numpy as np 
 from typing import Tuple
 
+from .metrics import calc_sharpe_ratio
+
 def calc_portfolio_returns_derivatives(
     F: np.ndarray, 
     Fprev: np.ndarray, 
@@ -18,6 +20,10 @@ def calc_portfolio_returns_derivatives(
         - F_prev: (m, 1) matrix of portfolio positions at time t-1
         - rt: (m, 1) matrix of asset returns at time t
         - delta: transaction costs
+
+    Returns: 
+        - dRdF: (m, 1) matrix derivative of portfolio returns wrt positions at time t
+        - dRdFprev: (m, 1) matrix derivative of portfolio returns wrt positions at time t-1
     """
 
     if F.shape != Fprev.shape: 
@@ -25,26 +31,28 @@ def calc_portfolio_returns_derivatives(
     elif Fprev.shape[0] != rt.shape[0]:
         raise ValueError("Fprev and rt must have the same second dimension.")
         
-    dRtdF = -delta * (1 + np.dot(Fprev.T, rt)) * np.sign(F - Fprev)
-    dRtdFprev = (1 -delta * np.sum(np.abs(F - Fprev))) * rt - dRtdF
+    dRdF = -delta * (1 + np.dot(Fprev.T, rt)) * np.sign(F - Fprev)
+    dRdFprev = (1 -delta * np.sum(np.abs(F - Fprev))) * rt - dRdF
 
-    return dRtdF, dRtdFprev
+    return dRdF, dRdFprev
 
-def cal_positions_derivative(
+def calc_positions_derivative(
     F: np.ndarray, 
     X: np.ndarray, 
     theta: np.ndarray, 
     y: np.ndarray, 
-    dFdtheta_prev: np.ndarray
-) -> Tuple: 
+    dFprev: np.ndarray
+) -> np.ndarray: 
     """Description. Return derivative of portfolio positions wrt to network parameters.
     
     Attributes: 
         - F: (m, 1) matrix of portfolio positions at time t
+        - X: (m, n+2) feature matrix
+        - theta: (m, n+2) matrix of network parameters
         - y: (m, 1) matrix of linear transformations
+        - dFprev: derivative of portfolio positions at time t-1
         
-    Returns: 
-        - dFdtheta: matrix with derivatives of positions wrt theta matrix."""
+    Returns: matrix with derivatives of positions wrt theta matrix."""
 
     if F.shape != y.shape: 
         raise ValueError("F and y must have the same shapes.")
@@ -57,6 +65,52 @@ def cal_positions_derivative(
     diag = 1 - np.tanh(y)**2
     np.fill_diagonal(dFdy, diag)
 
-    thetaF_prev = theta[:, -1].T
+    theta_Fprev = theta[:, -1].T
 
-    return dFdf * dFdy * (np.sum(X, axis=1) + np.diag(thetaF_prev) * dFdtheta_prev)
+    return dFdf * dFdy * (np.sum(X, axis=1) + np.diag(theta_Fprev) * dFprev)
+
+def calc_sharpe_derivative(
+    portfolio_returns: np.ndarray, 
+    returns: np.ndarray, 
+    delta: float, 
+    F: np.ndarray, 
+    Fprev: np.ndarray, 
+    dFprev: np.ndarray, 
+    X: np.ndarray, 
+    theta: np.ndarray, 
+    y: np.ndarray
+) -> Tuple: 
+    """Description. Return matrix of sharpe ratio derivatives wrt network parameters. 
+    
+    Attributes: 
+        - portfolio_returns: (t, 1) array of returns up to time t
+        - returns: (m, 1) matrix of asset returns at time t
+        - delta: transaction costs
+        - F: (m, 1) matrix ofportfolio positions at time t
+        - F_prev: (m, 1) matrix of portfolio positions at time t-1
+        - dFprev: (m, m) matrix derivative of portfolio positions at time t-1
+        - X: (m, n+2) feature matrix
+        - theta: (m, n+2) matrix of network parameters
+        - y: (m, 1) matrix of linear transformations
+    
+    Returns: 
+        - dS: (m, m) array of Sharpe ratio derivative wrt parameter matrix theta
+        - dF: (m, m) array of positions derivative wrt parameter matrix theta"""
+
+    T = portfolio_returns.shape[0]
+    A = np.mean(portfolio_returns) 
+    S = calc_sharpe_ratio(portfolio_returns)
+
+    dSdA = S * (1 + S**2) / A
+    dSdB = - S**3 / (2 * A**2)
+    dAdR = 1 / T
+    dBdR = 2 * portfolio_returns[-1, 0]
+    a = dSdA * dAdR + dSdB * dBdR
+
+    dRdF, dRdFprev = calc_portfolio_returns_derivatives(F, Fprev, returns, delta)
+    dF = calc_positions_derivative(F, X, theta, y, dFprev)
+    b = np.dot(np.diag(dRdF[:, 0]), dF) + np.dot(np.diag(dRdFprev[:, 0]), dFprev) 
+
+    dS = a * b
+
+    return dS, dF
