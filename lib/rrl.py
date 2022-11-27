@@ -56,10 +56,15 @@ class RRL:
         self.theta = np.random.normal(size=(self.n_assets, self.n_features+2))
         self.F = np.zeros(shape=(self.n_assets, 1))
 
-        self.dS = np.zeros(shape=(self.n_assets, self.n_features+2))
-        self.dF = np.zeros(shape=(1, self.n_assets, self.n_features+2))
-
         self.portfolio_returns = np.ones(shape=(1, 1))
+
+    def init_gradients(self): 
+        """Description. Initialize sharpe ratio and positions gradient."""
+
+        self.dS = np.zeros(shape=(self.n_assets, self.n_features+2))
+        self._dF = np.zeros(shape=(1, self.n_assets, self.n_features+2))
+
+        return self
 
     def __repr__(self) -> str:
         return f"RRL(n_assets={self.n_assets}, n_features={self.n_features}, delta={self.delta}, rho={self.rho}, l2={self.l2})"
@@ -108,15 +113,15 @@ class RRL:
             self.delta, 
             self.F[:, -1].reshape(self.n_assets, -1),
             self.F[:, -2].reshape(self.n_assets, -1),
-            self.dF[-1], 
+            self._dF[-1], 
             self._X, 
             self.theta, 
             self._y
         )
 
         self.dS = self.dS + dS
-        self.dF = np.concatenate((
-            self.dF, dF.reshape(1, self.n_assets, self.n_features+2)
+        self._dF = np.concatenate((
+            self._dF, dF.reshape(1, self.n_assets, self.n_features+2)
         ))
 
     def update_weights(self): 
@@ -135,10 +140,31 @@ def train(
     
     Attributes: 
         - model: RRL type model
-        - X: (m, n) feature matrix with indicators
-        - returns: (m, 1) array of returns
+        - X: (T, m, n) feature matrix with indicators over T periods
+        - returns: (T, m, 1) array of returns over T periods
         - n_epochs: number of epochs to train the RRL
         - tol: iteration stopping thresold
         
     Returns: updated RRL model."""
-    ...
+
+    sharpe_ratios = []
+
+    for i in tqdm(range(n_epochs)): 
+        model.init_gradients()
+
+        for t in range(X.shape[0]): 
+            Xt = X[t]
+            rt = returns[t]
+
+            model.forward(Xt, rt)
+            model.backward(rt)
+
+        S = calc_sharpe_ratio(model.portfolio_returns)
+        if i >= 1 and np.abs(S - sharpe_ratios[-1]) <= tol: 
+            break
+        else: 
+            model.update_weights()
+            sharpe_ratios.append(S)
+
+    return sharpe_ratios
+
