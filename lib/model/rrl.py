@@ -13,10 +13,7 @@ from .forward import (
 
 from .backpropagation import calc_sharpe_derivative
 
-from lib.metrics.metrics import (
-    calc_portfolio_returns, 
-    calc_sharpe_ratio, 
-)
+from lib.metrics.metrics import calc_portfolio_returns
 
 class RRL: 
     """Description. Recurent reinforcement learning trading system.
@@ -37,14 +34,7 @@ class RRL:
         rho: float = .1, 
         l2: float=.01
     ):
-        """Description. RRL network initialization. 
-        
-        Returns: 
-            - theta: initialized network parameter matrix
-            - F: initilized positions
-            - dF: initialized derivative matrix of positions wrt theta
-            - dS: initialized derivative matrix of Sharpe ratio wrt theta
-            - portfolio_returns: array to store portfolio returns"""
+        """Description. RRL network initialization."""
 
         self.n_assets, self.n_features = n_assets, n_features
         self.rho, self.l2 = rho, l2
@@ -57,8 +47,8 @@ class RRL:
 
     def _init_portfolio(self): 
         """Description. Initialize portfolio positions and returns."""
-        self.F = np.zeros(shape=(self.n_assets, 1))
-        self.portfolio_returns = np.ones(shape=(1, 1))
+        self.positions = np.zeros(shape=(self.n_assets, 1))
+        self.portfolio_returns = np.array([])
 
     def _init_gradients(self): 
         """Description. Initialize RRL gradients."""
@@ -77,28 +67,31 @@ class RRL:
             
         Returns: positions at time t."""
 
-        F_prev = self.F[:, -1].reshape(self.n_assets, -1)
-        if F_prev.shape != (self.n_assets, 1): 
-            raise ValueError(f"F_prev must have {(self.n_assets, 1)} shape.")
+        positions_prev = self.positions[:, -1].reshape(self.n_assets, -1)
+        if positions_prev.shape != (self.n_assets, 1): 
+            raise ValueError(f"positions_prev must have {(self.n_assets, 1)} shape.")
+
         self._X = np.concatenate(
-            (np.ones(shape=(self.n_assets, 1)), X, F_prev), 
-            axis=1
-        )
+            (np.ones(shape=(self.n_assets, 1)), X, positions_prev), 
+            axis=1)
+
         self._y = linear_transform(self._X, self.theta)
         self._z = activate(self._y)
-        self.F = np.concatenate(
-            (self.F, get_positions(self._z)), 
-            axis=1
-        )
 
-        self.portfolio_returns = np.concatenate((
-            self.portfolio_returns, 
-            calc_portfolio_returns(
-                self.F[:, -1].reshape(self.n_assets, -1), 
-                F_prev, 
-                returns, 
-                self.delta)
-        ))
+        self.positions = np.concatenate(
+            (self.positions, get_positions(self._z)), 
+            axis=1)
+
+        portfolio_returns = calc_portfolio_returns(
+            self.positions[:, -1].reshape(self.n_assets, -1), 
+            positions_prev, 
+            returns, 
+            self.delta)
+
+        if self.portfolio_returns.shape == (0,): 
+            self.portfolio_returns = portfolio_returns
+        else: 
+            self.portfolio_returns = np.concatenate((self.portfolio_returns, portfolio_returns)) 
         
     def backward(self, returns: np.ndarray): 
         """Description. Run backpropagation.
@@ -110,8 +103,8 @@ class RRL:
             self.portfolio_returns, 
             returns, 
             self.delta, 
-            self.F[:, -1].reshape(self.n_assets, -1),
-            self.F[:, -2].reshape(self.n_assets, -1),
+            self.positions[:, -1].reshape(self.n_assets, -1),
+            self.positions[:, -2].reshape(self.n_assets, -1),
             self._dF[-1], 
             self._X, 
             self.theta, 
@@ -126,69 +119,3 @@ class RRL:
     def update_weights(self): 
         """Description. Update network weights using gradient ascent rule."""
         self.theta = (1 - self.rho * self.l2) * self.theta + self.rho * self.dS
-
-def train(
-    model: RRL, 
-    X: np.ndarray, 
-    returns: np.ndarray, 
-    n_epochs: int=100, 
-    tol: float=0
-): 
-    """Description. 
-    Train the recurrent reinforcement learning model on data with m assets and n indicators. 
-    
-    Attributes: 
-        - model: RRL type model
-        - X: (T, m, n) feature matrix with indicators over T periods
-        - returns: (T, m, 1) array of returns over T periods
-        - n_epochs: number of epochs to train the RRL
-        - tol: iteration stopping thresold"""
-
-    sharpe_ratios = []
-
-    epochs = tqdm(range(n_epochs))
-    epochs.set_description("Training in progress...")
-
-    for i in epochs: 
-        model._init_gradients()
-        model._init_portfolio()
-
-        for t in range(X.shape[0]): 
-            Xt = X[t]
-            rt = returns[t]
-
-            model.forward(Xt, rt)
-            model.backward(rt)
-
-        S = calc_sharpe_ratio(model.portfolio_returns)
-        epochs.set_postfix(sharpe_ratio=S)
-
-        if i >= 1 and np.abs(S - sharpe_ratios[-1]) <= tol: 
-            break
-        else: 
-            model.update_weights()
-            sharpe_ratios.append(S)
-
-def validation(model: RRL, X: np.ndarray, returns: np.ndarray): 
-    """Description. 
-    Implement the strategy on unseen data.
-    
-    Attributes: 
-        - model: RRL type model
-        - X: (T, m, n) feature matrix with indicators over T periods
-        - returns: (T, m, 1) array of returns over T periods
-    
-    Returns: Sharpe ratio."""
-    model._init_portfolio()
-
-    print("Validation in progress...")
-
-    for t in range(X.shape[0]): 
-        Xt = X[t]
-        rt = returns[t]
-        model.forward(Xt, rt)
-
-    sharpe_ratio = calc_sharpe_ratio(model.portfolio_returns)
-    print(f"{sharpe_ratio=}")
-
-    return sharpe_ratio
