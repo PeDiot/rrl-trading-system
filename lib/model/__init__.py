@@ -1,1 +1,2 @@
-from .rrl import RRL, train, validation
+from .rrl import RRL
+from .optimize import train, validation
