@@ -1,4 +1,5 @@
 from pandas.core.frame import DataFrame
+from pandas.core.groupby.generic import DataFrameGroupBy
 from typing import List, Tuple
 import numpy as np 
 
@@ -31,6 +32,18 @@ def sort_by_colnames(df: DataFrame) -> DataFrame:
 
     return df.reindex(sorted(df.columns), axis=1)
 
+def to_batches(df: DataFrame, window_size: int) -> DataFrameGroupBy: 
+    """Description. 
+    Divide feature and return matrices into multiple batches.
+    
+    Attributes: 
+        - df: financial dataset with m assets over T periods
+        - window_size: windows size of each batches
+
+    Returns: iterable object of type DataFrameGroupBy.
+    """
+    return df.groupby(np.arange(len(df)) // window_size)
+
 def get_returns_matrix(df: DataFrame) -> np.ndarray: 
     """Description. Extract returns matrix for m assets over T periods."""
 
@@ -45,19 +58,4 @@ def get_feature_matrix(df: DataFrame, n_assets: int, n_features: int) -> np.ndar
 
     return df_std.values.reshape(df.shape[0], n_assets, n_features)
 
-def to_batches(features: np.ndarray, returns: np.ndarray, window_size: int) -> Tuple: 
-    """Description. 
-    Divide feature and return matrices into multiple batches.
     
-    Attributes: 
-        - features: (T, m, n) array with indicators
-        - returns: (T, m, 1) array of returns
-        - window_size: time length of each batches
-
-    Returns: batches of features, batches of returns
-    """
-
-    assert features.shape[0] == returns.shape[0]
-    n_batches = int(features.shape[0] / window_size)
-
-    return np.array_split(features, n_batches), np.array_split(returns, n_batches)
