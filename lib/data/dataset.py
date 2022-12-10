@@ -1,6 +1,8 @@
 import yfinance as yf 
 
 from dataclasses import dataclass, field
+from pandas.core.frame import DataFrame
+from typing import Tuple
 
 from .preprocess import (
     extract_columns, 
@@ -39,17 +41,26 @@ class Data:
         self.n_assets, self.n_features = len(self.assets), len(self.indicators)
 
         self.df = yf.download(self.assets, start=self.start_date, end=self.end_date)
-        
         self.df = extract_columns(self.df, self.assets, ["Close", "Volume", "High", "Low"])
-        self.df = add_returns(self.df, self.assets)
-        self.df = add_indicators(self.df, self.assets, self.indicators)
 
-        self.df.columns = reverse_colnames(self.df.columns)
-        self.df = sort_by_colnames(self.df)
+        self.batches = to_batches(self.df, self.window_size)
 
-        self.df = self.df.dropna()
+    def preprocess_batch(self, batch: DataFrame) -> Tuple: 
+        """Description. Compute returns and add indicators for a given batch.
+        
+        Attributes: 
+            - batch: initial data set
+        
+        Returns: feature matrix, returns matrix."""
 
-        self._features = get_feature_matrix(self.df, self.n_assets, self.n_features)
-        self._returns = get_returns_matrix(self.df)
+        batch = add_returns(batch, self.assets)
+        batch = add_indicators(batch, self.assets, self.indicators)
 
-        self.batch_features, self.batch_returns = to_batches(self._features, self._returns, self.window_size)
+        batch.columns = reverse_colnames(batch.columns)
+        batch =  sort_by_colnames(batch)
+        batch = batch.dropna(axis=0)
+
+        features = get_feature_matrix(batch, self.n_assets, self.n_features)
+        returns = get_returns_matrix(batch)
+
+        return features, returns
