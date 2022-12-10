@@ -38,12 +38,12 @@ def calc_cumulative_profits(returns: np.ndarray, initial: float) -> float:
 
     Returns: cumulative returns"""
 
-    return initial * np.cumprod(returns)
+    return initial * np.cumprod(1+returns)
 
-def calc_sharpe_ratio(returns: np.ndarray) -> float: 
+def calc_sharpe_ratio(returns: np.ndarray, window_size: int) -> float: 
     """Description. Return Sharpe ratio at time t.
     
     Attributes: 
         - returns: (t, 1) array of sharpe ratios."""
 
-    return np.mean(returns) / np.std(returns)
+    return np.mean(returns) / np.std(returns) * np.sqrt(window_size)
