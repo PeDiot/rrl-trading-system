@@ -89,7 +89,7 @@ def calc_sharpe_derivative(
         - portfolio_returns: (t, 1) array of returns up to time t
         - returns: (m, 1) matrix of asset returns at time t
         - delta: transaction costs
-        - F: (m, 1) matrix ofportfolio positions at time t
+        - F: (m, 1) matrix of portfolio positions at time t
         - F_prev: (m, 1) matrix of portfolio positions at time t-1
         - dFprev: (m, n+2) matrix derivative of portfolio positions at time t-1
         - X: (m, n+2) feature matrix
@@ -102,7 +102,7 @@ def calc_sharpe_derivative(
 
     T = portfolio_returns.shape[0]
     A = np.mean(portfolio_returns) 
-    S = calc_sharpe_ratio(portfolio_returns)
+    S = calc_sharpe_ratio(portfolio_returns, window_size=T)
 
     dSdA = S * (1 + S**2) / A
     dSdB = - S**3 / (2 * A**2)
