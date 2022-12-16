@@ -44,6 +44,14 @@ def to_batches(df: DataFrame, window_size: int) -> DataFrameGroupBy:
     """
     return df.groupby(np.arange(len(df)) // window_size)
 
+def get_batch_window(batch: DataFrame) -> str:
+    """Description. Return the training/trading period for a batch."""
+
+    dates = batch.index.strftime("%Y-%m-%d")
+    period = f"{dates[0]}/{dates[-1]}"
+
+    return period 
+
 def get_returns_matrix(df: DataFrame) -> np.ndarray: 
     """Description. Extract returns matrix for m assets over T periods."""
 

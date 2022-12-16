@@ -57,7 +57,7 @@ class Data:
         batch = add_indicators(batch, self.assets, self.indicators)
 
         batch.columns = reverse_colnames(batch.columns)
-        batch =  sort_by_colnames(batch)
+        batch = sort_by_colnames(batch)
         batch = batch.dropna(axis=0)
 
         features = get_feature_matrix(batch, self.n_assets, self.n_features)
