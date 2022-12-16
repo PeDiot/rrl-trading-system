@@ -18,8 +18,8 @@ def momentum_indicator(close: Series, window: int=14) -> Series:
     return 100 * close / close_shifted
 
 def normalized_average_true_range(close: Series, atr: Series) -> Series: 
-    """Description. 
-    Calculate normalized average true range."""
+    """Description. Calculate normalized average true range."""
+    
     return 100 * atr / close
 
 INDICATORS = {
