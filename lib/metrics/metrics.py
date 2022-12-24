@@ -29,16 +29,21 @@ def calc_portfolio_returns(
     b = 1 - delta * np.sum(np.abs(F - Fprev))
     return a * b - 1
 
-def calc_cumulative_profits(returns: np.ndarray, initial: float) -> float: 
+def calc_cumulative_returns(returns: np.ndarray) -> np.ndarray:
+    """Description. Compute cumulative returns"""
+
+    return np.cumprod(1+returns)
+
+def calc_cumulative_profits(cum_returns: np.ndarray, initial: float) -> float: 
     """Description. Calculate cumulative profits since initial investment.
 
     Attributes: 
-        - returns: portfolio returns
+        - cum_returns: cumulative returns
         - initial: initial invested amount
 
     Returns: cumulative returns"""
 
-    return initial * np.cumprod(1+returns)
+    return initial * cum_returns
 
 def calc_sharpe_ratio(returns: np.ndarray, window_size: int) -> float: 
     """Description. Return Sharpe ratio at time t.
