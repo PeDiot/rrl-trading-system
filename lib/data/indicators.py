@@ -2,6 +2,8 @@ from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 from typing import List
 
+import numpy as np
+
 from ta.momentum import rsi
 from ta.trend import macd
 from ta.volume import (
@@ -58,3 +60,13 @@ def add_indicators(
                 df[col_name] = INDICATORS[indicator](df, asset)
 
     return df
+
+def get_buy_and_hold_returns(data: DataFrame) -> DataFrame: 
+    """Description. 
+    Return cumulative returns for 'Buy and hold' strategy assuming equal weights for each asset."""
+
+    returns_df = data.loc[:, data.columns.str.contains("Close")].pct_change().dropna()
+    returns_df = returns_df.apply(lambda x: np.cumprod(1+x))
+    returns_df["cumulative_returns"] = returns_df.sum(axis=1) / returns_df.shape[1]
+
+    return returns_df

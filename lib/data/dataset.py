@@ -36,8 +36,8 @@ class Data:
 
 
     def __post_init__(self): 
-        """Description. Apply data preprocessing based on class inputs.
-        """
+        """Description. Apply data preprocessing based on class inputs."""
+        
         self.n_assets, self.n_features = len(self.assets), len(self.indicators)
 
         self.df = yf.download(self.assets, start=self.start_date, end=self.end_date)
@@ -45,13 +45,13 @@ class Data:
 
         self.batches = to_batches(self.df, self.window_size)
 
-    def preprocess_batch(self, batch: DataFrame) -> Tuple: 
+    def preprocess_batch(self, batch: DataFrame) -> DataFrame: 
         """Description. Compute returns and add indicators for a given batch.
         
         Attributes: 
             - batch: initial data set
         
-        Returns: feature matrix, returns matrix."""
+        Returns: batch dataframe."""
 
         batch = add_returns(batch, self.assets)
         batch = add_indicators(batch, self.assets, self.indicators)
@@ -59,6 +59,11 @@ class Data:
         batch.columns = reverse_colnames(batch.columns)
         batch = sort_by_colnames(batch)
         batch = batch.dropna(axis=0)
+
+        return batch 
+
+    def split(self, batch: DataFrame) -> Tuple: 
+        """Description. Extract feature matrix and returns from batch dataframe."""
 
         features = get_feature_matrix(batch, self.n_assets, self.n_features)
         returns = get_returns_matrix(batch)
