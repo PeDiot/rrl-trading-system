@@ -1,7 +1,3 @@
-"""Description.
-
-Implement an automated trading system based on recurrent reinforcement learning and technical indicators."""
-
 import numpy as np 
 from tqdm import tqdm
 

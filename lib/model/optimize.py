@@ -1,7 +1,8 @@
 from .rrl import RRL
 from lib.metrics.metrics import (
     calc_sharpe_ratio, 
-    calc_cumulative_profits
+    calc_cumulative_profits, 
+    calc_cumulative_returns, 
 )
 
 import numpy as np 
@@ -14,7 +15,7 @@ def train(
     X: np.ndarray, 
     returns: np.ndarray, 
     n_epochs: int=100, 
-    tol: float=0
+    tol: float=1e-3
 ): 
     """Description. 
     Train the recurrent reinforcement learning model on data with m assets and n indicators. 
@@ -76,6 +77,7 @@ def validation(
         model.forward(Xt, rt)
 
     sharpe_ratio = calc_sharpe_ratio(model.portfolio_returns, window_size)
-    cum_profits = calc_cumulative_profits(model.portfolio_returns, invest)
+    cum_returns = calc_cumulative_returns(model.portfolio_returns)
+    cum_profits = calc_cumulative_profits(cum_returns, invest)
 
-    return sharpe_ratio, cum_profits
+    return sharpe_ratio, cum_returns, cum_profits

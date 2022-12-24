@@ -1,7 +1,3 @@
-"""Description. 
-
-Methods to implement forward propagation."""
-
 import numpy as np 
 
 def linear_transform(x: np.ndarray, theta: np.ndarray) -> np.ndarray: 

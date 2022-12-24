@@ -1,7 +1,3 @@
-"""Description. 
-
-Methods to calculate derivatives for backpropagation."""
-
 import numpy as np 
 from typing import Tuple
 
