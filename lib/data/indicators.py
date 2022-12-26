@@ -13,6 +13,12 @@ from ta.volume import (
 )
 from ta.volatility import average_true_range
 
+from talib.abstract import (
+    HT_DCPHASE,
+    HT_SINE, 
+    HT_TRENDMODE
+)
+
 def momentum_indicator(close: Series, window: int=14) -> Series:
     """Description. Calculate momentum indicator."""
     close_shifted = close.shift(periods=window)
@@ -32,7 +38,10 @@ INDICATORS = {
     "ATR": lambda df, asset: average_true_range(df["High_"+asset], df["Low_"+asset], df["Close_"+asset]), 
     "NATR": lambda df, asset: normalized_average_true_range(df["Close_"+asset], df["ATR_"+asset]), 
     "CO": lambda df, asset: chaikin_money_flow(df["High_"+asset], df["Low_"+asset], df["Close_"+asset], df["Volume_"+asset]), 
-    "OBV": lambda df, asset: on_balance_volume(close=df["Close_"+asset], volume=df["Volume_"+asset])
+    "OBV": lambda df, asset: on_balance_volume(close=df["Close_"+asset], volume=df["Volume_"+asset]), 
+    "HTDCP": lambda df, asset: HT_DCPHASE(df["Close_"+asset]), 
+    "HTS": lambda df, asset: HT_SINE(df["Close_"+asset]), 
+    "HTTMMM": lambda df, asset: HT_TRENDMODE(df["Close_"+asset])
 }
 
 def add_indicators(
@@ -56,8 +65,13 @@ def add_indicators(
                 raise ValueError(f"Select indicators in {list(INDICATORS.keys())}")
 
             else: 
-                col_name = f"{indicator}_{asset}"
-                df[col_name] = INDICATORS[indicator](df, asset)
+                if indicator == "HTS": 
+                    sine, leadsine = INDICATORS[indicator](df, asset)
+                    df.loc[:, f"SINE_{asset}"] = sine 
+                    df.loc[:, f"LEADSINE_{asset}"] = leadsine
+                else: 
+                    col_name = f"{indicator}_{asset}"
+                    df.loc[:, col_name] = INDICATORS[indicator](df, asset)
 
     return df
 
