@@ -9,9 +9,6 @@ def create_backtest_dataset(results: Dict) -> DataFrame:
     """Description. 
     Return a data set with batch names, days, dates, cumulative returns and cumulative profits."""
 
-    assert list(results.keys()) == ["batch_names", "trading_dates", "positions", "portfolio_returns", "cumulative_returns", "cumulative_profits", "sharpe_ratios"]
-
-    n_groups = len(results["cumulative_profits"])-1
     window_sizes = [len(window) for window in results["trading_dates"]]
 
     batch_names = list(

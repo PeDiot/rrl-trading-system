@@ -35,8 +35,10 @@ def run_rrl_strategy(
         "portfolio_returns": [], 
         "cumulative_returns": [], 
         "cumulative_profits": [[initial_invest]], 
-        "sharpe_ratios": []
-
+        "sharpe_ratios": [], 
+        "assets": data.assets, 
+        "indicators": data.indicators, 
+        "pca_ncp": data.pca_ncp
     }
 
     batches = list(data.batches)
@@ -54,22 +56,23 @@ def run_rrl_strategy(
         train(rrl, X_tr, r_tr, n_epochs=n_epochs)
         
         batch_val = batch_val.copy()
+        batch_val = data.preprocess_batch(batch_val)
 
         if batch_val.shape[0] > 30: 
-            batch_val = data.preprocess_batch(batch_val)
             window_val = get_batch_window(batch_val)
-
             print(f"Validation window: {window_val}")
 
-            results["positions"].append(rrl.positions)
             results["trading_dates"].append(batch_val.index.strftime("%Y-%m-%d"))
 
-            X_val, r_val = data.split(batch_val)
+            X_val, r_val = data.split(batch_val) 
+
             sharpe, cum_rets, cum_profits = validation(
                 model=rrl, 
                 X=X_val, 
                 returns=r_val, 
                 invest=results["cumulative_profits"][-1][-1])
+            
+            results["positions"].append(rrl.positions)
 
             results["portfolio_returns"].append(rrl.portfolio_returns)
             results["sharpe_ratios"].append(sharpe)
@@ -83,6 +86,6 @@ def run_rrl_strategy(
             results["batch_names"].append(batch_name)
 
         else: 
-            print("Less than 30 observations in the validation set.")
+            print("Less than 30 observations in the validation set after preprocessing.")
 
     return results 
