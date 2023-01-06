@@ -74,13 +74,3 @@ def add_indicators(
                     df.loc[:, col_name] = INDICATORS[indicator](df, asset)
 
     return df
-
-def get_buy_and_hold_returns(data: DataFrame) -> DataFrame: 
-    """Description. 
-    Return cumulative returns for 'Buy and hold' strategy assuming equal weights for each asset."""
-
-    returns_df = data.loc[:, data.columns.str.contains("Close")].pct_change().dropna()
-    returns_df = returns_df.apply(lambda x: np.cumprod(1+x))
-    returns_df["cumulative_returns"] = returns_df.sum(axis=1) / returns_df.shape[1]
-
-    return returns_df

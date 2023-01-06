@@ -15,8 +15,19 @@ from .preprocess import (
 )
 
 from .indicators import add_indicators
-
 from .pca import get_reduced_features
+
+from lib.metrics import calc_cumulative_returns
+
+def get_buy_and_hold_df(data: DataFrame) -> DataFrame: 
+    """Description. 
+    Return cumulative returns for 'Buy and hold' strategy assuming equal weights for each asset."""
+
+    df = data.loc[:, data.columns.str.contains("Close")].pct_change().dropna()
+    df.loc[:, "returns"] = df.sum(axis=1) / df.shape[1]
+    df.loc[:, "cumulative_returns"] = calc_cumulative_returns(df["returns"].values)
+
+    return df.loc[:, ["returns", "cumulative_returns"]]
 
 @dataclass
 class Data:
