@@ -9,6 +9,8 @@ import plotly.express as px
 from typing import Dict, List, Optional
 from pandas.core.frame import DataFrame
 
+from .dataset import _make_df_pie
+
 def generate_layout(
     fig_height: int, 
     fig_width: int, 
@@ -180,5 +182,26 @@ def make_cumrets_barplot(df: DataFrame, layout: Layout) -> Figure:
     fig.update_xaxes(showticklabels=False)
     fig.update_layout(layout)
     fig.update_coloraxes(showscale=False) 
+
+    return fig
+
+def plot_avg_portfolio_allocation(results: Dict, layout: Layout) -> Figure: 
+    """Description. 
+    Return a pie chart representing average portfolio allocation over trading windows."""
+
+    n_assets = len(results["assets"])
+    palette = px.colors.sequential.Blues[-n_assets:]
+    palette.reverse()
+
+    df_pie = _make_df_pie(results)
+
+    fig = px.pie(
+        df_pie, 
+        values="% Share", 
+        names="Asset", 
+        hole=.4, 
+        color_discrete_sequence=palette)
+
+    fig.update_layout(layout)
 
     return fig

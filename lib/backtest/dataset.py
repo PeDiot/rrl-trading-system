@@ -54,3 +54,21 @@ def generate_df_barplot(df: DataFrame) -> DataFrame:
     df_barplot["Cumulative returns"] = df_barplot["Cumulative returns"].round(2)
 
     return df_barplot.rename(columns={"Batch": "Trading window"}) 
+
+def _make_df_pie(results: Dict) -> DataFrame: 
+    """Description. 
+    Aggregate startegy results to make pie chart dataframe."""
+
+    assets = results["assets"]
+    positions = results["positions"]
+
+    avg_positions_per_window = np.array([p.mean(axis=1) for p in positions]) 
+    avg_positions = avg_positions_per_window.mean(axis=0)
+
+
+    df_pie = pd.DataFrame({
+        "Asset": assets, 
+        "% Share": 100 * avg_positions
+    })
+
+    return df_pie

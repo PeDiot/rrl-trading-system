@@ -8,4 +8,5 @@ from .plots import (
     populate_subplots,
     plot_cumulative_profits, 
     make_cumrets_barplot, 
+    plot_avg_portfolio_allocation
 )
