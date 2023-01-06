@@ -15,7 +15,7 @@ def train(
     X: np.ndarray, 
     returns: np.ndarray, 
     n_epochs: int=100, 
-    tol: float=1e-3
+    tol: float=1e-5
 ): 
     """Description. 
     Train the recurrent reinforcement learning model on data with m assets and n indicators. 
@@ -43,7 +43,7 @@ def train(
 
             if t > 0: model.backward(rt)
 
-        S = calc_sharpe_ratio(model.portfolio_returns, window_size)
+        S = calc_sharpe_ratio(model.portfolio_returns)
         epochs.set_postfix(sharpe_ratio=S)
 
         if i >= 1 and np.abs(S - S_prev) <= tol: 
@@ -76,7 +76,7 @@ def validation(
         rt = returns[t]
         model.forward(Xt, rt)
 
-    sharpe_ratio = calc_sharpe_ratio(model.portfolio_returns, window_size)
+    sharpe_ratio = calc_sharpe_ratio(model.portfolio_returns, window_size=252)
     cum_returns = calc_cumulative_returns(model.portfolio_returns)
     cum_profits = calc_cumulative_profits(cum_returns, invest)
 
