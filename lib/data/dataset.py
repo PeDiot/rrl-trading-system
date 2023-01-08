@@ -3,6 +3,8 @@ import yfinance as yf
 import numpy as np
 from sklearn.decomposition import PCA
 
+from serde import serialize, deserialize
+
 from dataclasses import dataclass, field
 from pandas.core.frame import DataFrame
 from typing import Tuple, Optional
@@ -33,6 +35,8 @@ def get_buy_and_hold_df(data: DataFrame) -> DataFrame:
 
     return df.loc[:, ["returns", "cumulative_returns"]]
 
+@serialize
+@deserialize
 @dataclass
 class Data:
     """Description. 
