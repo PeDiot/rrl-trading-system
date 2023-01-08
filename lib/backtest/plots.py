@@ -125,6 +125,7 @@ def populate_subplots(
 def plot_cumulative_profits(
     backtest_results: Dict, 
     buy_and_hold_df: DataFrame, 
+    buy_and_hold_sr: float, 
     initial_invest: float, 
     layout: Layout
 ) -> Figure: 
@@ -156,7 +157,7 @@ def plot_cumulative_profits(
         x=buy_and_hold_df.index.values, 
         y=initial_invest*buy_and_hold_df["cumulative_returns"].values,
         mode="lines", 
-        name="Buy & Hold"
+        name=f"Buy & Hold | sr={round(buy_and_hold_sr, 2)}"
     ))
 
     title = "Cumulative profits from {} to {} | Initial investment={}".format(

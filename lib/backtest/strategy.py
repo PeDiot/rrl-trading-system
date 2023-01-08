@@ -48,7 +48,11 @@ def run_rrl_strategy(
         (_, batch_train), (_, batch_val) = batches[ix-1], batches[ix]
         
         batch_train = data.preprocess_batch(batch_train)
-        X_tr, r_tr = data.split(batch_train)
+
+        if data.pca_ncp != None:
+            X_tr, r_tr, pca = data.split(batch=batch_train, return_pca=True)
+        else: 
+            X_tr, r_tr = data.split(batch_train)
         
         if ix == 1: rrl.init_weights()
 
@@ -62,9 +66,12 @@ def run_rrl_strategy(
             window_val = get_batch_window(batch_val)
             print(f"Validation window: {window_val}")
 
-            results["trading_dates"].append(batch_val.index.strftime("%Y-%m-%d"))
+            results["trading_dates"].append(batch_val.index.strftime("%Y-%m-%d")[2:])
 
-            X_val, r_val = data.split(batch_val) 
+            if data.pca_ncp != None:
+                X_val, r_val = data.split(batch=batch_val, pca=pca) 
+            else:
+                X_val, r_val = data.split(batch_val) 
 
             sharpe, cum_rets, cum_profits = validation(
                 model=rrl, 
@@ -72,7 +79,7 @@ def run_rrl_strategy(
                 returns=r_val, 
                 invest=results["cumulative_profits"][-1][-1])
             
-            results["positions"].append(rrl.positions)
+            results["positions"].append(rrl.positions[:, 1:])
 
             results["portfolio_returns"].append(rrl.portfolio_returns)
             results["sharpe_ratios"].append(sharpe)
