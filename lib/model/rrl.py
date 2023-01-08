@@ -63,12 +63,12 @@ class RRL:
             
         Returns: positions at time t."""
 
-        positions_prev = self.positions[:, -1].reshape(self.n_assets, -1)
-        if positions_prev.shape != (self.n_assets, 1): 
+        self.positions_prev = self.positions[:, -1].reshape(self.n_assets, -1)
+        if self.positions_prev.shape != (self.n_assets, 1): 
             raise ValueError(f"positions_prev must have {(self.n_assets, 1)} shape.")
 
         self._X = np.concatenate(
-            (np.ones(shape=(self.n_assets, 1)), X, positions_prev), 
+            (np.ones(shape=(self.n_assets, 1)), X, self.positions_prev), 
             axis=1)
 
         self._y = linear_transform(self._X, self.theta)
@@ -78,9 +78,13 @@ class RRL:
             (self.positions, get_positions(self._z)), 
             axis=1)
 
+    def update_portfolio_returns(self, returns: np.ndarray): 
+        """Description. 
+        Compute portfolio returns for positions at time t using returns at time t+2."""
+
         portfolio_returns = calc_portfolio_returns(
             self.positions[:, -1].reshape(self.n_assets, -1), 
-            positions_prev, 
+            self.positions_prev, 
             returns, 
             self.delta)
 

@@ -35,13 +35,15 @@ def train(
         model._init_portfolio()
         window_size = X.shape[0]
 
-        for t in range(window_size): 
+        for t in range(window_size-2): 
             Xt = X[t]
-            rt = returns[t]
+            current_returns = returns[t]
+            future_returns = returns[t+2]
 
-            model.forward(Xt, rt)
+            model.forward(Xt, current_returns)
+            model.update_portfolio_returns(future_returns)
 
-            if t > 0: model.backward(rt)
+            if t > 0: model.backward(current_returns)
 
         S = calc_sharpe_ratio(model.portfolio_returns)
         epochs.set_postfix(sharpe_ratio=S)
@@ -71,10 +73,13 @@ def validation(
     model._init_portfolio()
     window_size = X.shape[0]
 
-    for t in range(window_size): 
+    for t in range(window_size-2): 
         Xt = X[t]
-        rt = returns[t]
-        model.forward(Xt, rt)
+        current_returns = returns[t]
+        future_returns = returns[t+2]
+
+        model.forward(Xt, current_returns)
+        model.update_portfolio_returns(future_returns)
 
     sharpe_ratio = calc_sharpe_ratio(model.portfolio_returns, window_size=252)
     cum_returns = calc_cumulative_returns(model.portfolio_returns)
