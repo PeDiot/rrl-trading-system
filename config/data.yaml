@@ -1,0 +1,23 @@
+start_date: '2009-12-31'
+end_date: '2017-12-29'
+window_size: 100
+assets:
+- AAP
+- XOM
+- MCD
+- MSFT
+- AMAT
+- VZ
+- NKE
+- NOV
+indicators:
+- MOM
+- MACD
+- MFI
+- RSI
+- ATR
+- NATR
+- CO
+- OBV
+pca_ncp: 5
+discrete_wavelet: true
