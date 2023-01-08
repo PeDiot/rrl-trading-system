@@ -1,5 +1,7 @@
 import yfinance as yf 
 
+from sklearn.decomposition import PCA
+
 from dataclasses import dataclass, field
 from pandas.core.frame import DataFrame
 from typing import Tuple, Optional
@@ -15,7 +17,8 @@ from .preprocess import (
 )
 
 from .indicators import add_indicators
-from .pca import get_reduced_features
+from .pca import get_pca_features
+from .dwt import DiscreteWavelet
 
 from lib.metrics import calc_cumulative_returns
 
@@ -41,6 +44,7 @@ class Data:
         - assets: list of asset names 
         - indicators: technical indicators to compute
         - pca_ncp: optional number of principal components for PCA
+        - discrete_wavelet: boolean indicating whether to denoise features using DiscretWavelet.
     """ 
     start_date: str 
     end_date: str 
@@ -50,6 +54,7 @@ class Data:
     indicators: list=field(default_factory=list)
 
     pca_ncp: Optional[int]=None
+    discrete_wavelet: bool=False 
 
     def __post_init__(self): 
         """Description. Apply data preprocessing based on class inputs."""
@@ -65,6 +70,8 @@ class Data:
 
         self.batches = to_batches(self.df, self.window_size)
 
+        if self.discrete_wavelet: 
+            self._dwt = DiscreteWavelet()
 
     def preprocess_batch(self, batch: DataFrame) -> DataFrame: 
         """Description. Compute returns and add indicators for a given batch.
@@ -83,14 +90,39 @@ class Data:
 
         return batch 
 
-    def split(self, batch: DataFrame) -> Tuple: 
-        """Description. Extract feature matrix and returns from batch dataframe."""
+    def split(self, batch: DataFrame, pca:Optional[PCA]=None, return_pca: bool=False) -> Tuple: 
+        """Description. 
+        Extract feature matrix and returns from batch dataframe.
+        
+        Attributes: 
+            - batch: preprocessed batch data frame
+            - pca: optional PCA object
+            
+        Returns: 
+            - feature matrix 
+            - returns matrix 
+            - optional PCA object.
+            
+        Details: 
+            - when PCA is used, the fit transformation is only applied on the train data set
+            - when discret wavelet is used, features are denoised."""
 
         features = get_feature_matrix(batch, self.n_assets, self.n_features)
-        
-        if self.pca_ncp != None: 
-            features = get_reduced_features(features, self.pca_ncp)
+
+        if self.discrete_wavelet: 
+            features = self._dwt.denoise(x=features)
 
         returns = get_returns_matrix(batch)
+        
+        if self.pca_ncp != None: 
+            features, pca = get_pca_features(features, self.pca_ncp, pca)
 
+            if self.discrete_wavelet: 
+                features = self._dwt.denoise(x=features)
+            
+            if return_pca: 
+                return features, returns, pca
+            else: 
+                return features, returns
+        
         return features, returns
