@@ -1,5 +1,6 @@
 import yfinance as yf 
 
+import numpy as np
 from sklearn.decomposition import PCA
 
 from dataclasses import dataclass, field
@@ -54,7 +55,7 @@ class Data:
     indicators: list=field(default_factory=list)
 
     pca_ncp: Optional[int]=None
-    discrete_wavelet: bool=False 
+    discrete_wavelet: bool=False
 
     def __post_init__(self): 
         """Description. Apply data preprocessing based on class inputs."""
@@ -108,9 +109,13 @@ class Data:
             - when discret wavelet is used, features are denoised."""
 
         features = get_feature_matrix(batch, self.n_assets, self.n_features)
+        window_size = features.shape[0]
 
         if self.discrete_wavelet: 
-            features = self._dwt.denoise(x=features)
+            features = np.apply_along_axis(
+                func1d=lambda x: self._dwt.denoise(x)[:window_size], 
+                axis=0, 
+                arr=features)
 
         returns = get_returns_matrix(batch)
         
@@ -118,7 +123,10 @@ class Data:
             features, pca = get_pca_features(features, self.pca_ncp, pca)
 
             if self.discrete_wavelet: 
-                features = self._dwt.denoise(x=features)
+                features = np.apply_along_axis(
+                func1d=lambda x: self._dwt.denoise(x)[:window_size], 
+                axis=0, 
+                arr=features)
             
             if return_pca: 
                 return features, returns, pca
