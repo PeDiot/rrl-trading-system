@@ -2,8 +2,6 @@ from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 from typing import List
 
-import numpy as np
-
 from ta.momentum import rsi
 from ta.trend import macd
 from ta.volume import (
