@@ -1,5 +1,4 @@
 import numpy as np 
-from tqdm import tqdm
 
 from .forward import (
     linear_transform, 
@@ -20,7 +19,7 @@ class RRL:
         - rho: learning rate for gradient ascent
         - l2: regularization parameter for gradient ascent
         - initial_invest: initial investment
-        - delta: transaction costs """
+        - delta: transaction costs"""
     
     def __init__(
         self, 
