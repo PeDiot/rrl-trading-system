@@ -34,4 +34,19 @@ the US. When downloading the data from Yahoo Finance, Open, High, Low, Close and
 | AAP | Advance Auto Parts, Inc. |
 | NOV | Nov, Inc. |
 
+### Technical indicators
+
+Technical indicators are heuristic or pattern-based signals produced by the price, volume, and/or open interest of a security or contract used by traders who follow technical analysis. In other words, they summarize the general pattern of the time series. While 4 groups of technical indicators are mentioned in the article, we solely use 3 types as depicted in the following table.
+
+|  Momentum | Volatility  | Volume |
+|---|---|---|
+| Momentum (MOM)  | Average True Range (ATR) | Chaikin Oscillator (CO) |
+| Moving Average Convergence Divergence (MACD) | Normalized Average True Range (NATR) | On Balance Volume (OBV) |
+| Money Flow Index (MFI) | | |
+| Relative Strength Index (RSI) | | |
+
+Both the [`ta`](https://pypi.org/project/ta/) and [`TA-Lib`](https://mrjbq7.github.io/ta-lib/) Python libraries are leveraged to compute the indicators without much difficulty. 
+
+We note $\mathcal{T}$ the set of technical indicators. 
+
 ## The RRL model
