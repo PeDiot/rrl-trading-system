@@ -1,7 +1,3 @@
-"""Description. 
-
-Financial metrics."""
-
 import numpy as np
 
 def calc_portfolio_returns(

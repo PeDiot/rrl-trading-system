@@ -24,7 +24,7 @@ from .indicators import add_indicators
 from .pca import get_pca_features
 from .dwt import DiscreteWavelet
 
-from lib.metrics import calc_cumulative_returns
+from rrl_trading.metrics import calc_cumulative_returns
 
 def get_buy_and_hold_df(data: DataFrame) -> DataFrame: 
     """Description. 

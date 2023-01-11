@@ -1,7 +1,7 @@
 import numpy as np 
 from typing import Tuple
 
-from lib.metrics.metrics import calc_sharpe_ratio
+from rrl_trading.metrics.metrics import calc_sharpe_ratio
 
 def calc_portfolio_returns_derivatives(
     F: np.ndarray, 

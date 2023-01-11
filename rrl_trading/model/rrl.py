@@ -8,7 +8,7 @@ from .forward import (
 
 from .backpropagation import calc_sharpe_derivative
 
-from lib.metrics.metrics import calc_portfolio_returns
+from rrl_trading.metrics.metrics import calc_portfolio_returns
 
 class RRL: 
     """Description. Recurent reinforcement learning trading system.

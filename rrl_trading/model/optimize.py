@@ -1,5 +1,5 @@
 from .rrl import RRL
-from lib.metrics.metrics import (
+from rrl_trading.metrics.metrics import (
     calc_sharpe_ratio, 
     calc_cumulative_profits, 
     calc_cumulative_returns, 

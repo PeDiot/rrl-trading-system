@@ -1,8 +1,8 @@
 from typing import Dict 
 
-from lib.model import train, validation 
-from lib.model import RRL 
-from lib.data import Data, get_batch_window
+from rrl_trading.model import train, validation 
+from rrl_trading.model import RRL 
+from rrl_trading.data import Data, get_batch_window
 
 def run_rrl_strategy(
     rrl: RRL, 
