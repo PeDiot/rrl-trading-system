@@ -71,7 +71,7 @@ PCA is the first technique used in the preprocessing layer and aims at reducing 
 
 #### Discrete Wavelet Transform (DWT)
 
-ALthough PCA is a powerful technique for dimension reduction, some local noise may persist in the training data. Consequently, the DWT method is applied on the principal components in $\mathcal{T}'$. First, the input data is decomposed into several coefficients so as to separate the general trend of the signal from the local noise. Then, we apply soft thresolding technique on the coefficients. Finally, the denoised version of the original signal is obtained with the inverse DWT method. The [`PyWavelets `](https://pywavelets.readthedocs.io/en/latest/) is used to implement Discrete Wavelet Transform. 
+ALthough PCA is a powerful technique for dimension reduction, some local noise may persist in the training data. Consequently, the DWT method is applied on the principal components in $\mathcal{T}'$. First, the input data is decomposed into several coefficients so as to separate the general trend of the signal from the local noise. Then, we apply soft thresolding technique on the coefficients. Finally, the denoised version of the original signal is obtained with the inverse DWT method. The [`PyWavelets`](https://pywavelets.readthedocs.io/en/latest/) is used to implement Discrete Wavelet Transform. 
 
 ### Train / trading split 
 
