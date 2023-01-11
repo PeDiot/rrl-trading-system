@@ -96,7 +96,7 @@ It is relevant to note that normalization and PCA are only fitted on the trainin
 
 Once the data fully prepreocessed and the training and trading batches created, the recurrent reinforcement lerning model can start its learning process. 
 
-### Objective
+### Objective function
 
 Based on the preprocessed technical indicators, the RRL agent aims at rebalancing the portfolio which is composed of $m$ assets with corresponding weights, denoted 
 
@@ -156,7 +156,7 @@ $$
 
 The sum of porftoflio weights at time $t$ is thus equal to 1 ie $\mathrm{F}_t^{'} \cdot \mathrm{e}_m = 1$.  
 
-The following schema is a simplified version of the basic neural network used to build the trading system. Here, the portfolio is made up of 2 assets and there are 2 preprocessed features to learn the optimal portfolio weights. The plain lines illustrate the network's parameters to learn. 
+The following schema is a simplified version of the basic neural network used to build the trading system. Here, the portfolio is made up of 2 assets and there are 2 preprocessed features to learn the optimal portfolio weights. The dotted lines illustrate the network's recirsive pattern. The dashed line stands for the assets' returns at time time $t-2$ that are used to derive portfolio return at time $t$. 
 
 <figure>
 <img src="imgs/rrl.png">
@@ -165,13 +165,13 @@ The following schema is a simplified version of the basic neural network used to
 
 ### Training 
 
+When training the PCA-DWT-RRL trading agent, the objective function needs to be maximized as it is the Sharpe ratio. To that end, the network's parameters are updated based on the gradient ascent rule. The following image shows the training process for one batch over $n$ epochs. Keep in mind that once the model trained, its performance is evaluated on the next batch in order to test its consistency. Then, the learning process is repeated until the last training batch. 
+
 <figure>
 <img
 src="imgs/rrl-learning.png" height="500" width="375">
 <figcaption><i><u>Algorithm used to train the RRL model</u></i></figcaption>
 </figure>
-
-### Validation / Trading
 
 ## Backtest
 
