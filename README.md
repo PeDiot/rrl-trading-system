@@ -107,16 +107,13 @@ $$
 where, 
 
 $$
-\begin{aligned} 
-    A = \frac{1}{T} \sum_{t=1}^T R_t \\\\
-    B = \frac{1}{T} \sum_{t=1}^T R_t^2
-\end{aligned}
+A = \frac{1}{T} \sum_{t=1}^T R_t \quad ; \quad  B = \frac{1}{T} \sum_{t=1}^T R_t^2
 $$
 
-Given $r_t$ the vector of assets' returns, $\delta$ the transaction fees and $e=(1, \dots, 1)'$, the portfolio return at time $t$ is:
+Given $\mathrm{r}_t$ the vector of assets' returns, $\delta$ the transaction fees and $\mathrm{e}=(1, \dots, 1)'$, the portfolio return at time $t$ is:
 
 $$
-R_t = (1 + \pmb{F}_{t-3}'r_{t})(1 - \delta \times e^{'}|F_{t-2} - F_{t-3}|) - 1
+R_t = (1 + \mathrm{F}_{t-3}^{'}\mathrm{r}_{t})(1 - \delta \times \mathrm{e}^{'}|F_{t-2} - F_{t-3}|) - 1
 $$
 
 Note we use positions computed at time $t-2$ to obtain returns at time $t$ since there is a usual 2-day delay when implementing daily trading strategies in practice. In the case where the positions are the same from time $t-3$ to time $t-2$, the $\delta$ term disappears from the formula.
