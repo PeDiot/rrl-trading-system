@@ -8,7 +8,12 @@ Inspired by the article entitled [An Automated Portfolio Trading System with Fea
 
 The below schema briefly depicts the two main parts of the trading bot namely the data preprocessing layers and the recurrent reinforcement learning (RRL) model. The following sections give more details about each step used to build the bot, as well as the results obtained during backtests.
 
-![](imgs/rrl-pca-dwt.png)
+<figure>
+<img
+src="imgs/rrl-pca-dwt.png">
+<br>
+<figcaption><i><u>Conceptual schema of the RRL-PCA-DWT trading system</u></i></figcaption>
+</figure>
 
 ## Data 
 
@@ -96,7 +101,7 @@ Once the data fully prepreocessed and the training and trading batches created, 
 
 Based on the preprocessed technical indicators, the RRL agent aims at rebalancing the portfolio which is composed of $m$ assets with corresponding weights, denoted 
 
-$$\mathrm{F}_t = (F_{1,t}, \dots, F_{m,t})^{'}$$
+$$\mathrm{F}_t = [F_{1,t}, \dots, F_{m,t}]^{'}$$
 
 $\mathrm{F}_t$ is updated at each period with a view to maximize Sharpe ratio defined as: 
 
@@ -110,22 +115,72 @@ $$
 A = \frac{1}{T} \sum_{t=1}^T R_t \quad ; \quad  B = \frac{1}{T} \sum_{t=1}^T R_t^2
 $$
 
-Given $\mathrm{r}_t$ the vector of assets' returns, $\delta$ the transaction fees and $\mathrm{e}=(1, \dots, 1)'$, the portfolio return at time $t$ is:
+Given $\mathrm{r}_t = (r_{1, t}, \dots, r_{m, t})^{'}$ the vector of assets' returns, $\delta$ the transaction fees and $\mathrm{e}_m=(1, \dots, 1)'$, the portfolio return at time $t$ is:
 
 $$
-R_t = (1 + \mathrm{F}_{t-3}^{'}\mathrm{r}_{t})(1 - \delta \times \mathrm{e}^{'}|F_{t-2} - F_{t-3}|) - 1
+R_t = (1 + \mathrm{F}_{t-3}^{'}\mathrm{r}_{t})(1 - \delta \cdot \mathrm{e}_m^{'}|F_{t-2} - F_{t-3}|) - 1
 $$
 
 Note we use positions computed at time $t-2$ to obtain returns at time $t$ since there is a usual 2-day delay when implementing daily trading strategies in practice. In the case where the positions are the same from time $t-3$ to time $t-2$, the $\delta$ term disappears from the formula.
 
 ### Architecture
 
-![](imgs/rrl.png)
+Let us note $\Theta = [\pmb{\theta}_1, \dots, \pmb{\theta}_m]^{'}$ the system parameter matrix to be learned during the training process, where $\pmb{\theta}_i$ is a $n+2 \times 1$ matrix. 
+
+The feature matrix is defined as $X_t = [\mathrm{x}_{1, t}, \dots, \mathrm{x}_{m,t}]^{'}$ such that $\mathrm{x}_{i, t} = [1, x_{i, 1, t}, \dots, x_{i, n, t}, F_{i, t-1}]$. 
+
+Note that $x_{i, j, t}$ is the $j$-th preprocessed technical indicator value at time $t$ and $F_{i, t-1}$ the portfolio weight at time $t-1$ for asset $i$. 
+
+The hidden values computed at time $t$ are store in the $m \times 1$ matrix $Y_t=[y_{1, t}, \dots, y_{m, t}]^{'}$ such as: 
+
+$$
+Y_t =  (X_t \otimes \Theta) \cdot \mathrm{e}_m
+$$
+
+where $\otimes$ is the element-wise product between matrices.
+
+We then use the hyperbolic tangent activation function such that: 
+
+$$
+\mathrm{f}_t = [f_{1, t}, \dots, f_{m, t}]^{'} = \text{tanh}(Y_t)
+$$
+
+Finally, we use the softmax function to normalize the outputs and obtain ortfolio weights at time $t$: 
+
+$$
+\mathrm{F}_t = \frac{\exp(\mathrm{f}_t)}{\mathrm{e}_m^{'} \cdot \exp(\mathrm{f}_t)}
+$$
+
+The sum of porftoflio weights at time $t$ is thus equal to 1 ie $\mathrm{F}_t^{'} \cdot \mathrm{e}_m = 1$.  
+
+The following schema is a simplified version of the basic neural network used to build the trading system. Here, the portfolio is made up of 2 assets and there are 2 preprocessed features to learn the optimal portfolio weights. The plain lines illustrate the network's parameters to learn. 
+
+<figure>
+<img 
+    src="imgs/rrl.png" 
+    height="350" 
+    width="500"
+>
+<br>
+<figcaption><i><u>Simplified architecture of the RRL model</u></i></figcaption>
+</figure>
 
 ### Training 
+
+<figure>
+<img
+src="imgs/rrl-learning.png" height="500" width="375">
+<br>
+<figcaption><i><u>Algorithm used to train the RRL model</u></i></figcaption>
+</figure>
 
 ### Validation / Trading
 
 ## Backtest
 
-![](imgs/cum-profits-rrl-pca-dwt-3.png)
+<figure>
+<img
+src="imgs/cum-profits-rrl-pca-dwt-3.png">
+<br>
+<figcaption><i><u>Comparison of the best strategy for different transaction fees</u></i></figcaption>
+</figure>
