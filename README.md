@@ -83,12 +83,12 @@ As shown by the conceptual schema, the data is divided into training and trading
 
 $$
 \begin{align*}
-\mathcal{B}_{\text{train}} & = \{ (X_b, \mathrm{y}_b) \}_{b=1}^{T-1} \\\\
-\mathcal{B}_{\text{val}} & = \{ (X_b, \mathrm{y}_b) \}_{b=2}^{T}
+\mathcal{B}_{\text{train}} & = \{ (X_b, \mathrm{r}_b) \}_{b=1}^{B-1} \\\\
+\mathcal{B}_{\text{val}} & = \{ (X_b, \mathrm{r}_b) \}_{b=2}^{B}
 \end{align*}
 $$
 
-where $X_b$ is the transformed feature matrix and $\mathrm{y}_b$ the target variable vector. 
+where $X_b$ is the transformed feature matrix, $\mathrm{y}_b$ is the matrix of returns for periods in the $b$-th batch and $B$ the number of 100-day batches.
 
 It is relevant to note that normalization and PCA are only fitted on the training batches and the technical indicators are calculated on each batch separately. The idea behind this is to ensure that the model's performance is an accurate reflection of its ability to generalize to new data.  
 
@@ -165,7 +165,7 @@ The following schema is a simplified version of the basic neural network used to
 
 ### Training 
 
-When training the PCA-DWT-RRL trading agent, the objective function needs to be maximized as it is the Sharpe ratio. To that end, the network's parameters are updated based on the gradient ascent rule. The following image shows the training process for one batch over $n$ epochs. Keep in mind that once the model trained, its performance is evaluated on the next batch in order to test its consistency. Then, the learning process is repeated until the last training batch. 
+When training the PCA-DWT-RRL trading agent, the objective function needs to be maximized as it is the Sharpe ratio. To that end, the network's parameters are updated based on the gradient ascent rule. The following image shows the training process for one batch over $n$ epochs. Keep in mind that once the model trained on batch $b$, its performance is evaluated on the batch $b+1$ in order to test its consistency. This learning/validation method is repeated until the last set of training/trading batch.
 
 <figure>
 <img
