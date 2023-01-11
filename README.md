@@ -107,10 +107,10 @@ $$
 where, 
 
 $$
-\begin{cases} 
+\begin{aligned} 
     A = \frac{1}{T} \sum_{t=1}^T R_t \\\\
     B = \frac{1}{T} \sum_{t=1}^T R_t^2
-\end{cases}
+\end{aligned}
 $$
 
 Given $r_t$ the vector of assets' returns, $\delta$ the transaction fees and $e=(1, \dots, 1)'$, the portfolio return at time $t$ is:
