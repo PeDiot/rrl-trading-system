@@ -89,7 +89,32 @@ It is relevant to note that normalization and PCA are only fitted on the trainin
 
 ## The RRL model
 
+Once the data fully prepreocessed and the training and trading batches created, the recurrent reinforcement lerning model can start its learning process. 
+
+### Objective
+
+Based on the preprocessed technical indicators, the RRL agent aims at rebalancing the portfolio which is composed of $m$ assets with corresponding weights, denoted $\pmb{F}_t = (F_{1,t}, \dots, F_{m,t})'$. 
+
+$\pmb{F}_t$ is updated at each period with a view to maximize Sharpe ratio defined as: 
+
+$$
+S_T = \frac{A}{\sqrt{B - A^2}} \quad \text{where } 
+\begin{cases} 
+    A = \frac{1}{T} \sum_{t=1}^T R_t \\\\
+    B = \frac{1}{T} \sum_{t=1}^T R_t^2
+\end{cases}
+$$
+
+Given $\pmb{r}_t$ the vector of assets' returns, $\delta$ the transaction fees and $\pmb{e}=(1, \dots, 1)'$, the portfolio return at time $t$ is:
+$$
+R_t = (1 + \pmb{F}_{t-3}'\pmb{r}_{t})(1 - \delta \times \pmb{e}'|F_{t-2} - F_{t-3}|) - 1
+$$
+
+Note we use positions computed at time $t-2$ to obtain returns at time $t$ since there is a usual 2-day delay when implementing daily trading strategies in practice. In the case where the positions are the same from time $t-3$ to time $t-2$, the $\delta$ term disappears from the formula.
+
 ### Architecture
+
+![](imgs/rrl.png)
 
 ### Training 
 
