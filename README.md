@@ -94,7 +94,7 @@ Once the data fully prepreocessed and the training and trading batches created, 
 
 ### Objective
 
-Based on the preprocessed technical indicators, the RRL agent aims at rebalancing the portfolio which is composed of $m$ assets with corresponding weights, denoted $\mathrm{F}_t = (F_{1,t}, \dots, F_{m,t})'$. 
+Based on the preprocessed technical indicators, the RRL agent aims at rebalancing the portfolio which is composed of $m$ assets with corresponding weights, denoted $\pmb{F}_t = (F_{1,t}, \dots, F_{m,t})^{'}$. 
 
 $\pmb{F}_t$ is updated at each period with a view to maximize Sharpe ratio defined as: 
 
