@@ -226,3 +226,13 @@ On the other hand, the `plot_avg_portfolio_allocation()` function shows the aver
   <img src="imgs/port-allocation-rrl-dwt-30bps.png" width="350" /> 
 </p>
 
+### Best strategy
+
+From the above pie chart, it can be noticed that AMAT, MSFT, MCD  and AAP accounts for more than 60% of the portfolio optimized by the trading agent. It seems interesting to run another RRL-DWT strategy with these 4 assets only. 
+
+<figure>
+<img
+src="imgs/cum-profits-rrl-dwt-2.png">
+</figure>
+
+Here, the trading system's decision seem to be efficient when fees are not too high ($\delta \leq 10$ bps).
