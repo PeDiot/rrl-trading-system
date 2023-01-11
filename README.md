@@ -11,7 +11,6 @@ The below schema briefly depicts the two main parts of the trading bot namely th
 <figure>
 <img
 src="imgs/rrl-pca-dwt.png">
-<br>
 <figcaption><i><u>Conceptual schema of the RRL-PCA-DWT trading system</u></i></figcaption>
 </figure>
 
@@ -125,9 +124,13 @@ Note we use positions computed at time $t-2$ to obtain returns at time $t$ since
 
 ### Architecture
 
-Let us note $\Theta = [\pmb{\theta}_1, \dots, \pmb{\theta}_m]^{'}$ the system parameter matrix to be learned during the training process, where $\pmb{\theta}_i$ is a $n+2 \times 1$ matrix. 
+Let us note $\Theta = [\pmb{\theta}_1, \dots, \pmb{\theta}_m]^{'}$ the system parameter matrix to be learned during the training process, where $\pmb{\theta}_i$ is a $(n+2) \times 1$ matrix. 
 
-The feature matrix is defined as $X_t = [\mathrm{x}_{1, t}, \dots, \mathrm{x}_{m,t}]^{'}$ such that $\mathrm{x}_{i, t} = [1, x_{i, 1, t}, \dots, x_{i, n, t}, F_{i, t-1}]$. 
+The feature matrix is defined as:
+
+$$
+X_t = [\mathrm{x}_{1, t}, \dots, \mathrm{x}_{m,t}]^{'} \quad \text{such that } \mathrm{x}_{i, t} = [1, x_{i, 1, t}, \dots, x_{i, n, t}, F_{i, t-1}]
+$$ 
 
 Note that $x_{i, j, t}$ is the $j$-th preprocessed technical indicator value at time $t$ and $F_{i, t-1}$ the portfolio weight at time $t-1$ for asset $i$. 
 
@@ -156,12 +159,7 @@ The sum of porftoflio weights at time $t$ is thus equal to 1 ie $\mathrm{F}_t^{'
 The following schema is a simplified version of the basic neural network used to build the trading system. Here, the portfolio is made up of 2 assets and there are 2 preprocessed features to learn the optimal portfolio weights. The plain lines illustrate the network's parameters to learn. 
 
 <figure>
-<img 
-    src="imgs/rrl.png" 
-    height="350" 
-    width="500"
->
-<br>
+<img src="imgs/rrl.png">
 <figcaption><i><u>Simplified architecture of the RRL model</u></i></figcaption>
 </figure>
 
@@ -170,7 +168,6 @@ The following schema is a simplified version of the basic neural network used to
 <figure>
 <img
 src="imgs/rrl-learning.png" height="500" width="375">
-<br>
 <figcaption><i><u>Algorithm used to train the RRL model</u></i></figcaption>
 </figure>
 
@@ -181,6 +178,5 @@ src="imgs/rrl-learning.png" height="500" width="375">
 <figure>
 <img
 src="imgs/cum-profits-rrl-pca-dwt-3.png">
-<br>
 <figcaption><i><u>Comparison of the best strategy for different transaction fees</u></i></figcaption>
 </figure>
