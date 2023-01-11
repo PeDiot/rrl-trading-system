@@ -235,4 +235,4 @@ From the above pie chart, it can be noticed that AMAT, MSFT, MCD  and AAP accoun
 src="imgs/cum-profits-rrl-dwt-2.png">
 </figure>
 
-Here, the trading system's decision seem to be efficient when fees are not too high ($\delta \leq 10$ bps).
+Here, the trading system's decision seem to be efficient when fees are not too high.
