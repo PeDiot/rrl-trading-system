@@ -222,7 +222,7 @@ On the one hand, one can get a dynamic visualisation of cumulative returns at th
 On the other hand, the `plot_avg_portfolio_allocation()` function shows the average portfolio allocation which is useful to identify the assets favored by the trading agent. 
 
 <p float="left">
-  <img src="imgs/cum-rets-rrl-dwt-30bps.png" width="350" height="200" />
-  <img src="imgs/port-allocation-rrl-dwt-30bps.png" width="300" /> 
+  <img src="imgs/cum-rets-rrl-dwt-30bps.png" width="450" height="250" />
+  <img src="imgs/port-allocation-rrl-dwt-30bps.png" width="350" /> 
 </p>
 
