@@ -2,7 +2,18 @@
 
 ## Objective 
 
-Inspired by the article entitled [An Automated Portfolio Trading System with Feature Preprocessing and Recurrent Reinforcement Learning](https://paperswithcode.com/paper/an-automated-portfolio-trading-system-with) written by Lin Li, we aim at implementing a fully automated trading system which incorporates a portfolio weight rebalance function and handles multiple assets. The trading bot is based on recurrent reinforcement learning and is developed in `python`. 
+Inspired by the article entitled [An Automated Portfolio Trading System with Feature Preprocessing and Recurrent Reinforcement Learning](https://paperswithcode.com/paper/an-automated-portfolio-trading-system-with) written by Lin Li, we aim at implementing a fully automated trading system which incorporates a portfolio weight rebalance function and handles multiple assets. The trading bot is based on recurrent reinforcement learning. 
+
+## `rrl_trading`
+
+To implement the article, a Python library named `rrl_trading` has been developed. It consists in 4 main sub-modules which are introduced below: 
+
+| Module | Description   |
+|---|---|
+| [`data`](rrl_trading/data/)  |  Data collection, indicators, preprocessing (PCA, DWT) |
+| [`model`](rrl_trading/model/) | RRL model, training, validation   |
+| [`metrics`](rrl_trading) | Cumulative returns/profits, Sharpe ratio   |
+| [`backtest`](rrl_trading/backtest/) | Run RRL strategy, visualisation |
 
 ## Conceptual framework
 
@@ -40,7 +51,7 @@ the US. When downloading the data from Yahoo Finance, Open, High, Low, Close and
 | AAP | Advance Auto Parts, Inc. |
 | NOV | Nov, Inc. |
 
-#### Technical indicators
+### Technical indicators
 
 Technical indicators are heuristic or pattern-based signals produced by the price, volume, and/or open interest of a security or contract used by traders who follow technical analysis. In other words, they summarize the general pattern of the time series. While 4 groups of technical indicators are mentioned in the article, we solely use 3 types as depicted in the following table.
 
@@ -90,7 +101,11 @@ $$
 
 where $X_b$ is the transformed feature matrix, $\mathrm{y}_b$ is the matrix of returns for periods in the $b$-th batch and $B$ the number of 100-day batches.
 
-It is relevant to note that normalization and PCA are only fitted on the training batches and the technical indicators are calculated on each batch separately. The idea behind this is to ensure that the model's performance is an accurate reflection of its ability to generalize to new data.  
+It is relevant to note that normalization and PCA are only fitted on the training batches and the technical indicators are calculated on each batch separately. The idea behind this is to ensure that the model's performance is an accurate reflection of its ability to generalize to new data. 
+
+### Dataset creation
+
+The [`data`](rrl_trading/data/) module from the `rrl_trading` library contains a dataclass named `Data` which helps the user creating the dataset easily. This dataclass incorporates all necessary methods to split the data into batches, compute indicators and apply the PCA & DWT transformations. 
 
 ## The RRL model
 
@@ -163,6 +178,10 @@ The following schema is a simplified version of the basic neural network used to
 <figcaption><i><u>Simplified architecture of the RRL model</u></i></figcaption>
 </figure>
 
+### Model implementation
+
+The [`model`](rrl_trading/model/) sub-module from the `rrl_trading` library implements a python version of the RRL model through the `RRL` class. The latter incorporates forward pass, backpropagation and computes portfolio returns for a given portfolio allocation.
+
 ### Training 
 
 When training the PCA-DWT-RRL trading agent, the objective function needs to be maximized as it is the Sharpe ratio. To that end, the network's parameters are updated based on the gradient ascent rule. The following image shows the training process for one batch over $n$ epochs. Keep in mind that once the model trained on batch $b$, its performance is evaluated on the batch $b+1$ in order to test its consistency. This learning/validation method is repeated until the last set of training/trading batch.
@@ -175,6 +194,8 @@ src="imgs/rrl-learning.png" height="500" width="375">
 
 More details on backpropagation can be found in the original [article](https://paperswithcode.com/paper/an-automated-portfolio-trading-system-with). 
 
+The [`optimize`](rrl_trading/model/optimize.py) sub-module from the `rrl_trading` library is used to train the RRL agent. 
+
 ## Backtest
 
 This final section presents backtesting results of different strategies based on the RRL trading system. The benchmark is the "Buy & hold" strategy in which the investor buy the stock at the begining of the trading period and sells at the end.
@@ -183,17 +204,25 @@ This final section presents backtesting results of different strategies based on
 
 In this section, emphasis is placed on comparing cumulative profits and annualized sharpe ratio for trading strategies implement on different preprocessed data. We set the transaction fees to 30 bps which is $\approx$ 0.003. 
 
-It can be noted that the best performance is obtained when we solely apply the Discrete Wavelet Transform in the preprocessing layer (RRL-DWT). The sharpe ratio is higher for the RRL-PCA-DWT and RRL-DWT strategies than for the "Buy & hold" benchmark. The two other RRL-based startegies perform poorly. 
+It can be noted that the best performance is obtained when we solely apply the Discrete Wavelet Transform in the preprocessing layer (RRL-DWT). The sharpe ratio is higher for the RRL-PCA-DWT and RRL-DWT strategies than for the "Buy & hold" benchmark. The two other RRL-based strategies perform poorly. 
 
 <figure>
 <img
 src="imgs/cum-profits-rrl-30bps.png">
 </figure>
 
+Note the above graph has been obtained using the `plot_cumulative_profits()` function from the [`backtest`](rrl_trading/backtest/) sub-module. 
+
 ### Analysis of the RRL-DWT strategy with fees=30 bps
 
+The [`backtest`](rrl_trading/backtest/) sub-module gives investors key insights about a specific startegy.
+
+On the one hand, one can get a dynamic visualisation of cumulative returns at the end of each trading window using the `make_cumrets_barplot()` function. The first plot indicates the RRL-DWT strategy obtain quite satisfying results over the different trading batches as only 3 of them get negative cumulative returns. 
+
+On the other hand, the `plot_avg_portfolio_allocation()` function shows the average portfolio allocation which is useful to identify the assets favored by the trading agent. 
+
 <p float="left">
-  <img src="imgs/cum-rets-rrl-dwt-30bps.png" width="650" height="350" />
-  <img src="imgs/port-allocation-rrl-dwt-30bps.png" width="500" /> 
+  <img src="imgs/cum-rets-rrl-dwt-30bps.png" width="350" height="200" />
+  <img src="imgs/port-allocation-rrl-dwt-30bps.png" width="300" /> 
 </p>
 
