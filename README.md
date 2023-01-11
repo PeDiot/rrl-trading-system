@@ -173,10 +173,27 @@ src="imgs/rrl-learning.png" height="500" width="375">
 <figcaption><i><u>Algorithm used to train the RRL model</u></i></figcaption>
 </figure>
 
+More details on backpropagation can be found in the original [article](https://paperswithcode.com/paper/an-automated-portfolio-trading-system-with). 
+
 ## Backtest
+
+This final section presents backtesting results of different strategies based on the RRL trading system. The benchmark is the "Buy & hold" strategy in which the investor buy the stock at the begining of the trading period and sells at the end.
+
+### Comparison of multiple startegies
+
+In this section, emphasis is placed on comparing cumulative profits and annualized sharpe ratio for trading strategies implement on different preprocessed data. We set the transaction fees to 30 bps which is $\approx$ 0.003. 
+
+It can be noted that the best performance is obtained when we solely apply the Discrete Wavelet Transform in the preprocessing layer (RRL-DWT). The sharpe ratio is higher for the RRL-PCA-DWT and RRL-DWT strategies than for the "Buy & hold" benchmark. The two other RRL-based startegies perform poorly. 
 
 <figure>
 <img
-src="imgs/cum-profits-rrl-pca-dwt-3.png">
-<figcaption><i><u>Comparison of the best strategy for different transaction fees</u></i></figcaption>
+src="imgs/cum-profits-rrl-30bps.png">
 </figure>
+
+### Analysis of the RRL-DWT strategy with fees=30 bps
+
+<p float="left">
+  <img src="imgs/cum-rets-rrl-dwt-30bps.png" width="650" height="350" />
+  <img src="imgs/port-allocation-rrl-dwt-30bps.png" width="500" /> 
+</p>
+
