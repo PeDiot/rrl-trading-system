@@ -50,9 +50,9 @@ def run_rrl_strategy(
         batch_train = data.preprocess_batch(batch_train)
 
         if data.pca_ncp != None:
-            X_tr, r_tr, pca = data.split(batch=batch_train, return_pca=True)
+            X_tr, r_tr, scaler, pca = data.split(batch=batch_train)
         else: 
-            X_tr, r_tr = data.split(batch_train)
+            X_tr, r_tr, scaler = data.split(batch_train)
         
         if ix == 1: rrl.init_weights()
 
@@ -69,9 +69,9 @@ def run_rrl_strategy(
             results["trading_dates"].append(batch_val.index.strftime("%Y-%m-%d")[2:])
 
             if data.pca_ncp != None:
-                X_val, r_val = data.split(batch=batch_val, pca=pca) 
+                X_val, r_val, _, _ = data.split(batch=batch_val, scaler=scaler, pca=pca) 
             else:
-                X_val, r_val = data.split(batch_val) 
+                X_val, r_val, _ = data.split(batch=batch_val, scaler=scaler) 
 
             sharpe, cum_rets, cum_profits = validation(
                 model=rrl, 

@@ -2,10 +2,11 @@ from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 from pandas.core.groupby.generic import DataFrameGroupBy
 
-from typing import List
+from typing import List, Optional, Tuple
 
 import pandas as pd 
 import numpy as np 
+from sklearn.preprocessing import StandardScaler
 
 def extract_columns(df: DataFrame, assets: List, feature_names: List) -> DataFrame: 
     """Description. Return data set with closing prices as features."""
@@ -75,14 +76,33 @@ def normalize(x: Series) -> Series:
 
     return (x - x.mean()) / std
 
-def get_feature_matrix(df: DataFrame, n_assets: int, n_features: int) -> np.ndarray: 
-    """Description. Normalize indicators and convert DataFrame into (T, m, n) array."""
+def get_feature_matrix(
+    df: DataFrame, 
+    n_assets: int, 
+    n_features: int, 
+    scaler: Optional[StandardScaler]=None
+) -> Tuple: 
+    """Description. Normalize indicators and convert DataFrame into (T, m, n) array.
+    
+    Attributes: 
+        - df: original data set
+        - n_assets: number of assets 
+        - n_features: number of technical indicators
+        - scaler: scaler used to apply normalization
+        
+    Returns: normalized feature matrix and standard scaler.
+    
+    Details: scaler is None when creating training feature matrix."""
 
     to_remove = ["close", "low", "high", "returns", "volume"]
-    df = df.loc[:, ~df.columns.str.contains("|".join(to_remove), case=False)]
+    X = df.loc[:, ~df.columns.str.contains("|".join(to_remove), case=False)].values
 
-    df_std = df.apply(normalize, axis=0)
+    if scaler == None: 
+        scaler = StandardScaler()
+        scaler.fit(X)
 
-    return df_std.values.reshape(df.shape[0], n_assets, n_features)
+    X_std = scaler.transform(X)
+
+    return X_std.reshape(df.shape[0], n_assets, n_features), scaler 
 
     

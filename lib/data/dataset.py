@@ -2,6 +2,7 @@ import yfinance as yf
 
 import numpy as np
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 from serde import serialize, deserialize
 
@@ -95,24 +96,31 @@ class Data:
 
         return batch 
 
-    def split(self, batch: DataFrame, pca:Optional[PCA]=None, return_pca: bool=False) -> Tuple: 
+    def split(
+        self, 
+        batch: DataFrame, 
+        scaler: Optional[StandardScaler]=None, 
+        pca:Optional[PCA]=None
+    ) -> Tuple: 
         """Description. 
         Extract feature matrix and returns from batch dataframe.
         
         Attributes: 
             - batch: preprocessed batch data frame
+            - scaler: optional scaler used to apply normalization
             - pca: optional PCA object
             
         Returns: 
             - feature matrix 
             - returns matrix 
+            - standard scaler
             - optional PCA object.
             
         Details: 
-            - when PCA is used, the fit transformation is only applied on the train data set
+            - when PCA is used, fit is only applied on the train data set
             - when discret wavelet is used, features are denoised."""
 
-        features = get_feature_matrix(batch, self.n_assets, self.n_features)
+        features, scaler = get_feature_matrix(batch, self.n_assets, self.n_features, scaler)
         window_size = features.shape[0]
 
         if self.discrete_wavelet: 
@@ -128,13 +136,10 @@ class Data:
 
             if self.discrete_wavelet: 
                 features = np.apply_along_axis(
-                func1d=lambda x: self._dwt.denoise(x)[:window_size], 
-                axis=0, 
-                arr=features)
+                    func1d=lambda x: self._dwt.denoise(x)[:window_size], 
+                    axis=0, 
+                    arr=features)
             
-            if return_pca: 
-                return features, returns, pca
-            else: 
-                return features, returns
+            return features, returns, scaler, pca
         
-        return features, returns
+        return features, returns, scaler
