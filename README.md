@@ -172,7 +172,7 @@ $$
 \mathrm{F}_t = \frac{\exp(\mathrm{f}_t)}{\mathrm{e}_m^{'} \cdot \exp(\mathrm{f}_t)}
 $$
 
-The sum of porftoflio weights at time $t$ is thus equal to 1 ie $\mathrm{F}_t^{'} \cdot \mathrm{e}_m = 1$.  
+It is important to note taht the trader that takes **only long positions**, which implies the sum of porftoflio weights at time $t$ is thus equal to 1 ie $\mathrm{F}_t^{'} \cdot \mathrm{e}_m = 1$.
 
 The following schema is a simplified version of the shallow neural network used to build the trading system. Here, the portfolio is made up of 2 assets and there are 2 preprocessed features to learn the optimal portfolio weights. The dotted lines illustrate the network's recursive pattern. The dashed line stands for the assets' returns at time time $t-2$ that are used to derive portfolio return.
 
