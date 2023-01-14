@@ -6,6 +6,8 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.express as px
 
+import numpy as np 
+
 from typing import Dict, List, Optional
 from pandas.core.frame import DataFrame
 
@@ -97,7 +99,7 @@ def populate_subplots(
             trace=go.Scatter(
                 x=df_[x_varname].values, 
                 y=df_[y_varname].values,
-                name=subplot_titles[ix].split("-")[-1],  
+                name="", 
                 showlegend=False), 
             row=1 + ix // ncols, 
             col=1 + ix % ncols

@@ -41,6 +41,7 @@ def calc_cumulative_profits(cum_returns: np.ndarray, initial: float) -> float:
 
     return initial * cum_returns
 
+    
 def calc_sharpe_ratio(returns: np.ndarray, window_size: int=1) -> float: 
     """Description. Return Sharpe ratio at time t.
     
