@@ -50,6 +50,11 @@ As in Lin Li's article, we used the 8 subsequent financial assets as input in th
 | AAP | Advance Auto Parts, Inc. |
 | NOV | Nov, Inc. |
 
+<figure>
+<img
+src="imgs/cumrets-per-asset.png">
+</figure>
+
 ### Technical indicators
 
 Technical indicators are heuristic or pattern-based signals produced by the price, volume, and/or open interest of a security or contract used by traders who follow technical analysis. In other words, they summarize the general pattern of the financial time series. While 4 groups of technical indicators are mentioned in the article, we solely use 3 types as depicted in the following table. Cycle indicators indeed decreased the performance of the RRL trading system.
