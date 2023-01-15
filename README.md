@@ -15,7 +15,7 @@ To implement the article, a Python library named `rrl_trading` has been develope
 | [`metrics`](rrl_trading) | Cumulative returns/profits, Sharpe ratio   |
 | [`backtest`](rrl_trading/backtest/) | Run RRL strategy, visualisation |
 
-The library can be used in a jupyter notebook as in [notebook.ipynb](notebook.ipynb) or in command line. You need to follow the following steps to use the library directly in your terminal: 
+The library can be used in a jupyter notebook as in [notebook.ipynb](notebook.ipynb) or in [command line](./rrl_trading/__main__.py). You need to follow the following steps to use the library directly in your terminal: 
 
 1. Indicate the data settings (assets, indicators, period, etc.) in the [data.yaml](config/data.yaml) configuration file
 2. Run the following command in you terminal 
