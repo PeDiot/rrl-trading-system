@@ -15,6 +15,24 @@ To implement the article, a Python library named `rrl_trading` has been develope
 | [`metrics`](rrl_trading) | Cumulative returns/profits, Sharpe ratio   |
 | [`backtest`](rrl_trading/backtest/) | Run RRL strategy, visualisation |
 
+The library can be used in a jupyter notebook as in [notebook.ipynb](notebook.ipynb) or in command line. You need to follow the following steps to use the library directly in your terminal: 
+
+1. Indicate the data settings (assets, indicators, period, etc.) in the [data.yaml](config/data.yaml) configuration file
+2. Run the following command in you terminal 
+
+  ```python
+  python -m rrl_trading -config_path "./config/data.yaml" -initial_invest [INITIAL_INVEST] -fees [FEES] -n_epochs [N_EPOCHS] -version [VERSION]
+  ```
+
+  **Notes**: 
+  - `-initial_invest` can be integer of float
+  - `-fees` can take "no_fees", "10bps", "30bps", etc. as value ("bps" stands for "basis points"). It is recommended to use integer values for the bps fees. 
+  - `-n_epochs` must be an integer
+  - `-version` can be an integer or a string.
+
+3. The RRL model is saved in the [`backup/`](./backup) folder and the visualisations as `.png` files in [`imgs/`](./imgs). 
+
+
 ## Conceptual framework
 
 The below schema briefly depicts the two main parts of the trading bot namely the data preprocessing layer as well as the recurrent reinforcement learning model, its training and validation process. The following sections give more details about each step used to build the bot, as well as the results obtained during backtests.
